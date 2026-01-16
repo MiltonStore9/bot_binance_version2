@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es" data-bs-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <title>Grid Emulator</title>
+
+  <!-- refresh automático -->
+  <meta http-equiv="refresh" content="{{ refresh }}">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Plotly -->
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+
+  <style>
+    body { background: #0b0b0b !important; }
+    .card { background: #111 !important; border-color: #222 !important; }
+    .table { --bs-table-bg: #111; --bs-table-striped-bg: #151515; --bs-table-border-color: #222; }
+    .nav-tabs .nav-link { color: #bbb; }
+    .nav-tabs .nav-link.active { color: #fff; }
+  </style>
+</head>
+
+<body>
+<div class="container-fluid p-3">
+
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h4 class="mb-0">📈 Grid Emulator (Binance fees)</h4>
+      <small class="text-secondary">
+        Última actualización: <strong>{{ now }}</strong> | Auto-refresh: {{ refresh }}s
+      </small>
+    </div>
+    <div class="text-end">
+      <div class="badge text-bg-dark">{{ cfg.symbol }}</div>
+      <div class="badge text-bg-secondary">TZ: {{ cfg.show_timezone }}</div>
+    </div>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-md-3">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-secondary small">Capital inicial (mark @start)</div>
+          <div class="fs-5 fw-semibold">{{ summary.initial_value_s }} USDT</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-3">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-secondary small">Valor final (mark @last)</div>
+          <div class="fs-5 fw-semibold">{{ summary.final_value_s }} USDT</div>
+          <div class="text-secondary small">Last price: {{ summary.last_price_s }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-3">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-secondary small">PnL</div>
+          <div class="fw-semibold">Realizado: <span class="text-success">{{ summary.realized_pnl_s }}</span></div>
+          <div class="fw-semibold">No realizado: <span class="text-info">{{ summary.unrealized_pnl_s }}</span></div>
+          <div class="fw-bold">Total: <span class="text-danger">{{ summary.total_pnl_s }}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-3">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="text-secondary small">Estado</div>
+          <div class="fw-semibold">Pares cerrados: {{ summary.completed_pairs }}</div>
+          <div class="fw-semibold">Open LONG: {{ summary.open_longs }} | SELL->BUY: {{ summary.open_shorts }}</div>
+          <div class="text-secondary small">Inv: {{ summary.base_end_s }} BTC | {{ summary.quote_end_s }} USDT</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plot (Plotly) -->
+  <div class="card shadow-sm mb-3">
+    <div class="card-body">
+      <div id="chart" style="width:100%; height:520px;"></div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab">
+        Events (últimos 80)
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#pairs" type="button" role="tab">
+        Pairs (últimos 80)
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content border border-top-0 bg-black p-3 shadow-sm">
+    <!-- EVENTS -->
+    <div class="tab-pane fade show active" id="events" role="tabpanel">
+      {% if events and events|length > 0 %}
+      <div class="table-responsive">
+        <table class="table table-sm table-striped align-middle">
+          <thead>
+          <tr>
+            {% for k in events[0].keys() %}
+              <th class="small text-secondary">{{ k }}</th>
+            {% endfor %}
+          </tr>
+          </thead>
+          <tbody>
+          {% for r in events %}
+            <tr>
+              {% for k,v in r.items() %}
+                <td class="small">{{ v }}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="text-secondary">No hubo operaciones.</div>
+      {% endif %}
+    </div>
+
+    <!-- PAIRS -->
+    <div class="tab-pane fade" id="pairs" role="tabpanel">
+      {% if pairs and pairs|length > 0 %}
+      <div class="table-responsive">
+        <table class="table table-sm table-striped align-middle">
+          <thead>
+          <tr>
+            {% for k in pairs[0].keys() %}
+              <th class="small text-secondary">{{ k }}</th>
+            {% endfor %}
+          </tr>
+          </thead>
+          <tbody>
+          {% for r in pairs %}
+            <tr>
+              {% for k,v in r.items() %}
+                <td class="small">{{ v }}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <div class="text-secondary">No hubo pares completados.</div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  const fig = {{ fig_json | safe }};
+  const config = {
+    responsive: true,
+    displayModeBar: true,
+    scrollZoom: true,
+  };
+
+  Plotly.newPlot("chart", fig.data, fig.layout, config);
+
+  // Por si cambia el tamaño (rotación móvil / resize)
+  window.addEventListener("resize", () => Plotly.Plots.resize("chart"));
+</script>
+</body>
+</html>
+ 
