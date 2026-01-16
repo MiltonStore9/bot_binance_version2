@@ -37,9 +37,9 @@ def index():
     end_utc = end_local.astimezone(ZoneInfo("UTC"))
 
     # ---- TU CONFIG ----
-    my_grids = [91508, 92908]  # ONLY real grids
-    trading_bot_start_price = 92188.95
-    capital_invertido = 106.95
+    my_grids = [3231, 3252,3273]
+    trading_bot_start_price = 3275.09 
+    capital_invertido = 60.00 
 
     cfg = GridConfig(
         symbol="ETHUSDT",
@@ -131,3 +131,4 @@ def index():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
