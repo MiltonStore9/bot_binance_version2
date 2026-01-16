@@ -2,3 +2,5 @@ flask
 pandas
 requests
 matplotlib
+gunicorn
+
