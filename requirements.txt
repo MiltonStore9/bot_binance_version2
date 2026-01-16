@@ -3,4 +3,6 @@ pandas
 requests
 matplotlib
 gunicorn
+plotly
+
 
