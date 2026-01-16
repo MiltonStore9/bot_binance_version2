@@ -30,15 +30,15 @@ def index():
     tz_pe = ZoneInfo("America/Lima")
 
     # ---- rango ----
-    start_local = datetime(2026, 1, 11, 23, 54, tzinfo=tz_pe)
+    start_local = datetime(2026, 1, 16, 17, 41, tzinfo=tz_pe)
     end_local = datetime.now(tz_pe)
 
     start_utc = start_local.astimezone(ZoneInfo("UTC"))
     end_utc = end_local.astimezone(ZoneInfo("UTC"))
 
     # ---- TU CONFIG ----
-    my_grids = [3231, 3252,3273]
-    trading_bot_start_price = 3275.09 
+    my_grids = [3245, 3266,3308]
+    trading_bot_start_price = 3285.08
     capital_invertido = 60.00 
 
     cfg = GridConfig(
@@ -131,4 +131,5 @@ def index():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
